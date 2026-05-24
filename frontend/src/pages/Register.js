@@ -21,46 +21,154 @@ function Register() {
     }
   };
 
+  const inputStyle = {
+    width: '100%',
+    padding: '11px 14px',
+    background: '#2a2a2a',
+    border: '1px solid #3a3a3a',
+    borderRadius: '4px',
+    color: '#fff',
+    fontSize: '14px',
+    fontFamily: 'inherit',
+    outline: 'none',
+    boxSizing: 'border-box',
+    transition: 'border-color 0.15s',
+  };
+
   return (
-    <div style={{ maxWidth: '400px', margin: '100px auto', padding: '20px' }}>
-      <h2>Create Account</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleRegister}>
-        <div style={{ marginBottom: '10px' }}>
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            style={{ width: '100%', padding: '8px' }}
-            required
-          />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{ width: '100%', padding: '8px' }}
-            required
-          />
-        </div>
-        <div style={{ marginBottom: '10px' }}>
-          <input
-            type="password"
-            placeholder="Password (min 8 characters)"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{ width: '100%', padding: '8px' }}
-            required
-          />
-        </div>
-        <button type="submit" style={{ width: '100%', padding: '10px', background: '#1A3C6E', color: 'white', border: 'none', cursor: 'pointer' }}>
-          Register
-        </button>
-      </form>
-      <p>Already have an account? <Link to="/login">Login</Link></p>
+    <div style={{
+      minHeight: '100vh',
+      background: '#121212',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontFamily: "'Helvetica Neue', Arial, sans-serif",
+      color: '#fff',
+      padding: '20px',
+    }}>
+      {/* Logo */}
+      <Link to="/" style={{
+        background: '#F5C518',
+        color: '#000',
+        fontWeight: 900,
+        fontSize: '24px',
+        padding: '6px 12px',
+        borderRadius: '4px',
+        textDecoration: 'none',
+        marginBottom: '32px',
+        letterSpacing: '-0.5px',
+      }}>
+        MML
+      </Link>
+
+      <div style={{
+        background: '#1a1a1a',
+        border: '1px solid #2a2a2a',
+        borderRadius: '8px',
+        padding: '32px',
+        width: '100%',
+        maxWidth: '380px',
+      }}>
+        <h2 style={{ fontSize: '22px', fontWeight: 700, marginBottom: '6px', letterSpacing: '-0.3px' }}>
+          Create account
+        </h2>
+        <p style={{ color: '#888', fontSize: '13px', marginBottom: '24px' }}>
+          Start tracking and rating your favorite films.
+        </p>
+
+        {error && (
+          <div style={{
+            background: 'rgba(229,9,20,0.12)',
+            border: '1px solid #c0392b',
+            color: '#ff6b6b',
+            padding: '10px 14px',
+            borderRadius: '4px',
+            marginBottom: '16px',
+            fontSize: '13px',
+          }}>
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '13px', color: '#aaa', marginBottom: '6px', fontWeight: 500 }}>
+              Username
+            </label>
+            <input
+              type="text"
+              placeholder="moviefan123"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              style={inputStyle}
+              onFocus={(e) => e.target.style.borderColor = '#F5C518'}
+              onBlur={(e) => e.target.style.borderColor = '#3a3a3a'}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '13px', color: '#aaa', marginBottom: '6px', fontWeight: 500 }}>
+              Email address
+            </label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              style={inputStyle}
+              onFocus={(e) => e.target.style.borderColor = '#F5C518'}
+              onBlur={(e) => e.target.style.borderColor = '#3a3a3a'}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '13px', color: '#aaa', marginBottom: '6px', fontWeight: 500 }}>
+              Password <span style={{ color: '#555', fontWeight: 400 }}>(min 8 characters)</span>
+            </label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              style={inputStyle}
+              onFocus={(e) => e.target.style.borderColor = '#F5C518'}
+              onBlur={(e) => e.target.style.borderColor = '#3a3a3a'}
+            />
+          </div>
+
+          <button
+            type="submit"
+            style={{
+              marginTop: '4px',
+              padding: '11px',
+              background: '#F5C518',
+              color: '#000',
+              border: 'none',
+              borderRadius: '4px',
+              fontWeight: 700,
+              fontSize: '15px',
+              cursor: 'pointer',
+              fontFamily: 'inherit',
+              transition: 'background 0.15s',
+            }}
+            onMouseEnter={(e) => e.target.style.background = '#e6b800'}
+            onMouseLeave={(e) => e.target.style.background = '#F5C518'}
+          >
+            Create Account
+          </button>
+        </form>
+
+        <div style={{ margin: '20px 0', borderTop: '1px solid #2a2a2a' }} />
+
+        <p style={{ textAlign: 'center', color: '#888', fontSize: '13px' }}>
+          Already have an account?{' '}
+          <Link to="/login" style={{ color: '#F5C518', fontWeight: 600, textDecoration: 'none' }}>
+            Sign in
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
