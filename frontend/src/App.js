@@ -8,6 +8,9 @@ import MyLists from './pages/MyLists';
 import Profile from './pages/Profile';
 import ListDetail from './pages/ListDetail'; 
 import UserProfile from './pages/UserProfile';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminMovies from './pages/AdminMovies';
+import AdminUsers from './pages/AdminUsers';
 
 function App() {
   return (
@@ -21,7 +24,9 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/lists/:id" element={<ListDetail />} />
         <Route path="/user/:userId" element={<UserProfile />} />
-
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/movies" element={<AdminMovies />} />
+        <Route path="/admin/users" element={<AdminUsers />} />
 
       </Routes>
     </Router>

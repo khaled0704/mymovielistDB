@@ -2,162 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import API from '../api';
 
-const styles = {
-  root: {
-    minHeight: '100vh',
-    background: '#121212',
-    fontFamily: "'Helvetica Neue', Arial, sans-serif",
-    color: '#fff',
-  },
-  nav: {
-    background: '#000',
-    padding: '0 24px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    height: '56px',
-    position: 'sticky',
-    top: 0,
-    zIndex: 200,
-    borderBottom: '1px solid #2a2a2a',
-  },
-  navLeft: { display: 'flex', alignItems: 'center', gap: '24px' },
-  logo: {
-    background: '#F5C518',
-    color: '#000',
-    fontWeight: 900,
-    fontSize: '20px',
-    padding: '4px 8px',
-    borderRadius: '4px',
-    letterSpacing: '-0.5px',
-    textDecoration: 'none',
-    whiteSpace: 'nowrap',
-  },
-  navLink: {
-    color: '#fff',
-    fontSize: '14px',
-    fontWeight: 500,
-    textDecoration: 'none',
-    padding: '4px 0',
-    borderBottom: '2px solid transparent',
-    transition: 'border-color 0.15s',
-  },
-  navUser: { color: '#aaa', fontSize: '14px' },
-  signInBtn: {
-    background: '#F5C518',
-    color: '#000',
-    border: 'none',
-    padding: '6px 16px',
-    borderRadius: '4px',
-    fontWeight: 700,
-    fontSize: '14px',
-    cursor: 'pointer',
-  },
-  logoutBtn: {
-    background: 'transparent',
-    color: '#aaa',
-    border: '1px solid #444',
-    padding: '5px 14px',
-    borderRadius: '4px',
-    fontSize: '13px',
-    cursor: 'pointer',
-  },
-  hero: {
-    background: 'linear-gradient(to bottom, #1a1a1a 0%, #121212 100%)',
-    padding: '48px 40px 40px',
-    borderBottom: '1px solid #2a2a2a',
-  },
-  heroTitle: {
-    fontSize: '30px',
-    fontWeight: 800,
-    marginBottom: '6px',
-    letterSpacing: '-0.5px',
-  },
-  heroSub: { color: '#aaa', fontSize: '15px', marginBottom: '24px' },
-  searchWrap: {
-    display: 'flex',
-    maxWidth: '600px',
-    background: '#fff',
-    borderRadius: '4px',
-    overflow: 'hidden',
-    border: '2px solid #F5C518',
-  },
-  searchInput: {
-    flex: 1,
-    padding: '10px 16px',
-    fontSize: '15px',
-    border: 'none',
-    background: '#fff',
-    color: '#111',
-    outline: 'none',
-    fontFamily: 'inherit',
-  },
-  searchBtn: {
-    background: '#F5C518',
-    border: 'none',
-    padding: '10px 20px',
-    fontSize: '15px',
-    cursor: 'pointer',
-    fontWeight: 700,
-    color: '#000',
-  },
-  content: { padding: '32px 40px' },
-  sectionHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-    marginBottom: '20px',
-  },
-  sectionTitle: {
-    fontSize: '20px',
-    fontWeight: 700,
-    borderLeft: '4px solid #F5C518',
-    paddingLeft: '12px',
-    letterSpacing: '-0.3px',
-  },
-  sectionCount: { color: '#888', fontSize: '14px', fontWeight: 400 },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-    gap: '16px',
-  },
-  card: {
-    background: '#1a1a1a',
-    borderRadius: '4px',
-    overflow: 'hidden',
-    border: '1px solid #2a2a2a',
-    transition: 'transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease',
-    textDecoration: 'none',
-    display: 'block',
-    cursor: 'pointer',
-  },
-  cardImg: { width: '100%', height: '260px', objectFit: 'cover', display: 'block' },
-  cardImgFallback: {
-    width: '100%',
-    height: '260px',
-    background: '#222',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '48px',
-  },
-  cardBody: { padding: '10px 12px 14px' },
-  cardTitle: { fontSize: '14px', fontWeight: 700, color: '#fff', marginBottom: '4px', lineHeight: 1.3 },
-  cardMeta: { color: '#888', fontSize: '12px', marginBottom: '6px' },
-  cardRating: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-    fontSize: '13px',
-    fontWeight: 700,
-    color: '#F5C518',
-  },
-  empty: { color: '#555', textAlign: 'center', padding: '80px 0', fontSize: '16px' },
-};
-
 function Home() {
   const [movies, setMovies] = useState([]);
   const [search, setSearch] = useState('');
+  const [currentSlide, setCurrentSlide] = useState(0);
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
 
@@ -165,103 +13,200 @@ function Home() {
     API.get('/movies').then((res) => setMovies(res.data));
   }, []);
 
+  useEffect(() => {
+    if (featuredMovies.length === 0) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % featuredMovies.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [movies]);
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     navigate('/login');
   };
 
-  const filteredMovies = movies.filter(
-    (m) =>
-      m.title.toLowerCase().includes(search.toLowerCase()) ||
-      m.genre.some((g) => g.toLowerCase().includes(search.toLowerCase()))
+  const filteredMovies = movies.filter((m) =>
+    m.title.toLowerCase().includes(search.toLowerCase()) ||
+    m.genre.some((g) => g.toLowerCase().includes(search.toLowerCase()))
   );
 
+  const featuredMovies = movies.filter((m) => m.poster).slice(0, 6);
+  const featured = featuredMovies[currentSlide];
+
   return (
-    <div style={styles.root}>
+    <div style={{ minHeight: '100vh', background: '#1a1a1a', color: '#e8e8e8' }}>
+
       {/* Navbar */}
-      <nav style={styles.nav}>
-        <div style={styles.navLeft}>
-          <span style={styles.logo}>MML</span>
-          <Link to="/" style={{ ...styles.navLink, color: '#F5C518', borderBottomColor: '#F5C518' }}>Movies</Link>
-          <Link to="/my-lists" style={styles.navLink}>My Lists</Link>
+      <nav style={{
+        background: '#111', padding: '0 32px',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        borderBottom: '1px solid #2a2a2a', height: '56px',
+        position: 'sticky', top: 0, zIndex: 100
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+          <div style={{ background: '#f5c518', color: '#000', fontWeight: 900, fontSize: '15px', padding: '4px 8px', borderRadius: '4px' }}>MML</div>
+          <Link to="/" style={{ color: '#f5c518', fontSize: '14px', fontFamily: 'Arial', fontWeight: 600 }}>Movies</Link>
+          <Link to="/my-lists" style={{ color: '#aaa', fontSize: '14px', fontFamily: 'Arial' }}>My Lists</Link>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           {user ? (
             <>
-              <span style={styles.navUser}>
-                👤 <strong style={{ color: '#fff' }}>{user.username}</strong>
-              </span>
-              <Link to="/profile" style={styles.navLink}>Profile</Link>
-              <button onClick={handleLogout} style={styles.logoutBtn}>Sign Out</button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#f5c518', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 'bold', color: '#000' }}>
+                  {user.username[0].toUpperCase()}
+                </div>
+                <Link to="/profile" style={{ color: '#e8e8e8', fontSize: '14px', fontFamily: 'Arial' }}>{user.username}</Link>
+              </div>
+              <Link to="/profile" style={{ color: '#aaa', fontSize: '14px', fontFamily: 'Arial' }}>Profile</Link>
+              {user.role === 'admin' && (
+              <Link to="/admin" style={{ color: '#f5c518', fontSize: '14px', fontFamily: 'Arial', fontWeight: 'bold' }}>Admin</Link>
+              )}
+                          <button onClick={handleLogout} style={{ padding: '5px 14px', background: 'transparent', color: '#e8e8e8', border: '1px solid #444', borderRadius: '4px', fontSize: '13px' }}>
+                Sign Out
+              </button>
             </>
           ) : (
             <>
-              <Link to="/login" style={styles.navLink}>Sign In</Link>
-              <Link to="/register">
-                <button style={styles.signInBtn}>Register</button>
+              <Link to="/login" style={{ color: '#aaa', fontSize: '14px', fontFamily: 'Arial' }}>Sign In</Link>
+              <Link to="/register" style={{ padding: '5px 14px', background: '#f5c518', color: '#000', borderRadius: '4px', fontSize: '13px', fontWeight: 'bold', fontFamily: 'Arial' }}>
+                Register
               </Link>
             </>
           )}
         </div>
       </nav>
 
-      {/* Hero */}
-      <div style={styles.hero}>
-        <h1 style={styles.heroTitle}>MyMovieList</h1>
-        <p style={styles.heroSub}>Rate movies, write reviews, and build your personal watchlists.</p>
-        <div style={styles.searchWrap}>
+      {/* Hero Carousel */}
+      {featured && !search && (
+        <div style={{ position: 'relative', height: '480px', overflow: 'hidden' }}>
+          {featuredMovies.map((movie, i) => (
+            <div key={movie._id} style={{
+              position: 'absolute', inset: 0,
+              backgroundImage: `url(${movie.poster})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center top',
+              filter: 'brightness(0.3)',
+              opacity: i === currentSlide ? 1 : 0,
+              transition: 'opacity 0.8s ease-in-out'
+            }} />
+          ))}
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(to right, rgba(17,17,17,0.97) 35%, rgba(17,17,17,0.2) 100%)'
+          }} />
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0, height: '100px',
+            background: 'linear-gradient(to top, #1a1a1a, transparent)'
+          }} />
+
+          {/* Content */}
+          <div style={{ position: 'relative', zIndex: 2, padding: '60px 48px', maxWidth: '580px' }}>
+            <div style={{ display: 'flex', gap: '6px', marginBottom: '14px', flexWrap: 'wrap' }}>
+              {featured.genre.map((g) => (
+                <span key={g} style={{
+                  background: 'rgba(245,197,24,0.15)', color: '#f5c518',
+                  padding: '2px 10px', borderRadius: '3px', fontSize: '12px',
+                  fontFamily: 'Arial', border: '1px solid rgba(245,197,24,0.3)'
+                }}>{g}</span>
+              ))}
+            </div>
+            <h2 style={{ fontSize: '38px', fontWeight: 700, marginBottom: '10px', fontFamily: 'Arial', lineHeight: 1.2 }}>
+              {featured.title}
+            </h2>
+            <p style={{ color: '#aaa', fontSize: '14px', marginBottom: '10px', fontFamily: 'Arial' }}>
+              {featured.releaseYear} &nbsp;•&nbsp; {featured.director}
+            </p>
+            <p style={{
+              color: '#777', fontSize: '14px', marginBottom: '28px', fontFamily: 'Arial', lineHeight: 1.7,
+              display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden'
+            }}>{featured.synopsis}</p>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <Link to={`/movies/${featured._id}`} style={{
+                padding: '10px 26px', background: '#f5c518', color: '#000',
+                borderRadius: '4px', fontSize: '14px', fontFamily: 'Arial', fontWeight: 'bold'
+              }}>View Film</Link>
+              {featured.averageRating > 0 && (
+                <span style={{ color: '#f5c518', fontSize: '15px', fontFamily: 'Arial' }}>
+                  ★ {featured.averageRating}/10
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Dots */}
+          <div style={{ position: 'absolute', bottom: '20px', left: '48px', display: 'flex', gap: '8px', zIndex: 3 }}>
+            {featuredMovies.map((_, i) => (
+              <button key={i} onClick={() => setCurrentSlide(i)} style={{
+                width: i === currentSlide ? '24px' : '8px', height: '8px',
+                borderRadius: '4px', background: i === currentSlide ? '#f5c518' : '#444',
+                border: 'none', cursor: 'pointer', padding: 0, transition: 'all 0.3s'
+              }} />
+            ))}
+          </div>
+
+          {/* Arrows */}
+          <button onClick={() => setCurrentSlide((prev) => (prev - 1 + featuredMovies.length) % featuredMovies.length)}
+            style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.6)', color: '#f5c518', border: '1px solid #333', borderRadius: '50%', width: '38px', height: '38px', fontSize: '20px', cursor: 'pointer', zIndex: 3 }}>‹</button>
+          <button onClick={() => setCurrentSlide((prev) => (prev + 1) % featuredMovies.length)}
+            style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.6)', color: '#f5c518', border: '1px solid #333', borderRadius: '50%', width: '38px', height: '38px', fontSize: '20px', cursor: 'pointer', zIndex: 3 }}>›</button>
+        </div>
+      )}
+
+      {/* Search + Movies */}
+      <div style={{ padding: '30px 48px' }}>
+        {/* Search */}
+        <div style={{ display: 'flex', gap: '0', marginBottom: '30px', maxWidth: '480px' }}>
           <input
             type="text"
             placeholder="Search movies by title or genre..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={styles.searchInput}
+            style={{
+              flex: 1, padding: '10px 16px', background: '#2a2a2a',
+              border: '1px solid #f5c518', borderRight: 'none',
+              borderRadius: '4px 0 0 4px', color: '#e8e8e8', fontSize: '14px',
+              fontFamily: 'Arial'
+            }}
           />
-          <button style={styles.searchBtn}>🔍</button>
+          <button style={{ padding: '10px 16px', background: '#f5c518', border: 'none', borderRadius: '0 4px 4px 0', cursor: 'pointer', fontSize: '16px' }}>🔍</button>
         </div>
-      </div>
 
-      {/* Grid */}
-      <div style={styles.content}>
-        <div style={styles.sectionHeader}>
-          <h2 style={styles.sectionTitle}>
-            All Movies <span style={styles.sectionCount}>({filteredMovies.length})</span>
-          </h2>
+        {/* Title */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+          <div style={{ width: '3px', height: '22px', background: '#f5c518', borderRadius: '2px' }} />
+          <h3 style={{ fontSize: '18px', fontFamily: 'Arial', fontWeight: 700, color: '#e8e8e8' }}>
+            All Movies <span style={{ color: '#aaa', fontWeight: 400, fontSize: '15px' }}>({filteredMovies.length})</span>
+          </h3>
         </div>
 
         {filteredMovies.length === 0 ? (
-          <p style={styles.empty}>No movies found matching "{search}"</p>
+          <p style={{ color: '#555', textAlign: 'center', marginTop: '80px', fontFamily: 'Arial' }}>No movies found.</p>
         ) : (
-          <div style={styles.grid}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '20px' }}>
             {filteredMovies.map((movie) => (
-              <Link
-                to={`/movies/${movie._id}`}
-                key={movie._id}
-                style={styles.card}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-4px)';
-                  e.currentTarget.style.borderColor = '#F5C518';
-                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.5)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.borderColor = '#2a2a2a';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              >
-                {movie.poster ? (
-                  <img src={movie.poster} alt={movie.title} style={styles.cardImg} />
-                ) : (
-                  <div style={styles.cardImgFallback}>🎬</div>
-                )}
-                <div style={styles.cardBody}>
-                  <p style={styles.cardTitle}>{movie.title}</p>
-                  <p style={styles.cardMeta}>{movie.releaseYear} · {movie.genre.join(', ')}</p>
-                  <div style={styles.cardRating}>
-                    ⭐ {movie.averageRating}
-                    <span style={{ color: '#888', fontWeight: 400 }}>/10</span>
+              <Link to={`/movies/${movie._id}`} key={movie._id} style={{ textDecoration: 'none' }}>
+                <div style={{ cursor: 'pointer', transition: 'transform 0.15s' }}
+                  onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'}
+                  onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+                >
+                  <div style={{ position: 'relative', borderRadius: '4px', overflow: 'hidden', marginBottom: '8px', border: '1px solid #2a2a2a' }}>
+                    {movie.poster ? (
+                      <img src={movie.poster} alt={movie.title} style={{ width: '100%', height: '220px', objectFit: 'cover', display: 'block' }} />
+                    ) : (
+                      <div style={{ width: '100%', height: '220px', background: '#2a2a2a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span style={{ fontSize: '40px' }}>🎬</span>
+                      </div>
+                    )}
+                    {movie.averageRating > 0 && (
+                      <div style={{ position: 'absolute', bottom: '6px', left: '6px', background: 'rgba(0,0,0,0.85)', padding: '2px 6px', borderRadius: '3px', fontSize: '12px', color: '#f5c518', fontFamily: 'Arial' }}>
+                        ★ {movie.averageRating}
+                      </div>
+                    )}
                   </div>
+                  <p style={{ fontSize: '13px', fontWeight: 600, color: '#e8e8e8', marginBottom: '3px', fontFamily: 'Arial' }}>{movie.title}</p>
+                  <p style={{ fontSize: '12px', color: '#777', fontFamily: 'Arial' }}>{movie.releaseYear} · {movie.genre.join(', ')}</p>
                 </div>
               </Link>
             ))}

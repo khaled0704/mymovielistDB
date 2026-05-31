@@ -20,6 +20,7 @@ app.use('/api/movies', require('./routes/movieRoutes'));
 app.use('/api/reviews', require('./routes/reviewRoutes'));
 app.use('/api/lists', require('./routes/listRoutes'));
 app.use('/api/users', require('./routes/users'));
+app.use('/api/admin', require('./routes/adminRoutes'));
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
