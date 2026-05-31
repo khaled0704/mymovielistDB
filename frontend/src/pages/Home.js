@@ -6,6 +6,8 @@ function Home() {
   const [movies, setMovies] = useState([]);
   const [search, setSearch] = useState('');
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [genreFilter, setGenreFilter] = useState('');
+  const [yearFilter, setYearFilter] = useState('');
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
 
@@ -27,13 +29,22 @@ function Home() {
     navigate('/login');
   };
 
-  const filteredMovies = movies.filter((m) =>
-    m.title.toLowerCase().includes(search.toLowerCase()) ||
-    m.genre.some((g) => g.toLowerCase().includes(search.toLowerCase()))
-  );
+  const filteredMovies = movies.filter((m) => {
+    const matchesSearch = m.title.toLowerCase().includes(search.toLowerCase()) ||
+      m.genre.some((g) => g.toLowerCase().includes(search.toLowerCase()));
+    const matchesGenre = genreFilter ? m.genre.includes(genreFilter) : true;
+    const matchesYear = yearFilter ? m.releaseYear === Number(yearFilter) : true;
+    return matchesSearch && matchesGenre && matchesYear;
+  });
 
   const featuredMovies = movies.filter((m) => m.poster).slice(0, 6);
   const featured = featuredMovies[currentSlide];
+  const allGenres = [
+  'Action', 'Adventure', 'Animation', 'Comedy', 'Crime',
+  'Documentary', 'Drama', 'Fantasy', 'Horror', 'Mystery',
+  'Romance', 'Sci-Fi', 'Thriller', 'Western'
+  ];
+  const allYears = Array.from({ length: 2025 - 1900 + 1 }, (_, i) => 2025 - i);
 
   return (
     <div style={{ minHeight: '100vh', background: '#1a1a1a', color: '#e8e8e8' }}>
@@ -156,23 +167,65 @@ function Home() {
 
       {/* Search + Movies */}
       <div style={{ padding: '30px 48px' }}>
-        {/* Search */}
-        <div style={{ display: 'flex', gap: '0', marginBottom: '30px', maxWidth: '480px' }}>
-          <input
-            type="text"
-            placeholder="Search movies by title or genre..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{
-              flex: 1, padding: '10px 16px', background: '#2a2a2a',
-              border: '1px solid #f5c518', borderRight: 'none',
-              borderRadius: '4px 0 0 4px', color: '#e8e8e8', fontSize: '14px',
-              fontFamily: 'Arial'
-            }}
-          />
-          <button style={{ padding: '10px 16px', background: '#f5c518', border: 'none', borderRadius: '0 4px 4px 0', cursor: 'pointer', fontSize: '16px' }}>🔍</button>
-        </div>
+        {/* Search + Filters */}
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '30px', flexWrap: 'wrap' }}>
+          {/* Search input */}
+          <div style={{ display: 'flex', flex: 1, minWidth: '260px' }}>
+            <input
+              type="text"
+              placeholder="Search movies by title or genre..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{
+                flex: 1, padding: '10px 16px', background: '#2a2a2a',
+                border: '1px solid #f5c518', borderRight: 'none',
+                borderRadius: '4px 0 0 4px', color: '#e8e8e8', fontSize: '14px',
+                fontFamily: 'Arial'
+              }}
+            />
+            <button style={{ padding: '10px 16px', background: '#f5c518', border: 'none', borderRadius: '0 4px 4px 0', cursor: 'pointer', fontSize: '16px' }}>🔍</button>
+          </div>
 
+          {/* Genre filter */}
+          <select
+            value={genreFilter}
+            onChange={(e) => setGenreFilter(e.target.value)}
+            style={{
+              padding: '10px 14px', background: '#2a2a2a', border: '1px solid #444',
+              borderRadius: '4px', color: '#e8e8e8', fontSize: '14px', fontFamily: 'Arial', cursor: 'pointer'
+            }}
+          >
+            <option value="">All Genres</option>
+            {allGenres.map((g) => (
+              <option key={g} value={g}>{g}</option>
+            ))}
+          </select>
+
+          {/* Year filter */}
+          <select
+            value={yearFilter}
+            onChange={(e) => setYearFilter(e.target.value)}
+            style={{
+              padding: '10px 14px', background: '#2a2a2a', border: '1px solid #444',
+              borderRadius: '4px', color: '#e8e8e8', fontSize: '14px', fontFamily: 'Arial', cursor: 'pointer'
+            }}
+          >
+            <option value="">All Years</option>
+            {allYears.map((y) => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+
+          {/* Clear filters button — only shows when filters are active */}
+          {(genreFilter || yearFilter || search) && (
+            <button
+              onClick={() => { setSearch(''); setGenreFilter(''); setYearFilter(''); }}
+              style={{ padding: '10px 16px', background: 'transparent', color: '#aaa', border: '1px solid #444', borderRadius: '4px', fontSize: '13px', fontFamily: 'Arial' }}
+            >
+              ✕ Clear
+            </button>
+          )}
+        </div>
         {/* Title */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
           <div style={{ width: '3px', height: '22px', background: '#f5c518', borderRadius: '2px' }} />
