@@ -65,9 +65,6 @@ function Home() {
           {user ? (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#f5c518', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', fontWeight: 'bold', color: '#000' }}>
-                  {user.username[0].toUpperCase()}
-                </div>
                 <Link to="/profile" style={{ color: '#e8e8e8', fontSize: '14px', fontFamily: 'Arial' }}>{user.username}</Link>
               </div>
               <Link to="/profile" style={{ color: '#aaa', fontSize: '14px', fontFamily: 'Arial' }}>Profile</Link>
