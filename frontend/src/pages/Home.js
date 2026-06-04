@@ -57,7 +57,7 @@ function Home() {
         position: 'sticky', top: 0, zIndex: 100
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-          <div style={{ background: '#f5c518', color: '#000', fontWeight: 900, fontSize: '15px', padding: '4px 8px', borderRadius: '4px' }}>MML</div>
+          <Link to="/" style={{ background: '#f5c518', color: '#000', fontWeight: 900, fontSize: '15px', padding: '4px 8px', borderRadius: '4px', textDecoration: 'none', letterSpacing: '-0.5px' }}>MML</Link>
           <Link to="/" style={{ color: '#f5c518', fontSize: '14px', fontFamily: 'Arial', fontWeight: 600 }}>Movies</Link>
           <Link to="/my-lists" style={{ color: '#aaa', fontSize: '14px', fontFamily: 'Arial' }}>My Lists</Link>
         </div>
