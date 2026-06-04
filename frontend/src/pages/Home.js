@@ -8,11 +8,22 @@ function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [genreFilter, setGenreFilter] = useState('');
   const [yearFilter, setYearFilter] = useState('');
+  const [navAvatar, setNavAvatar] = useState('');
+  const [navAvatarError, setNavAvatarError] = useState(false);
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
     API.get('/movies').then((res) => setMovies(res.data));
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      API.get('/auth/profile').then((res) => {
+        if (res.data.avatar) setNavAvatar(res.data.avatar);
+      }).catch(() => {});
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -64,10 +75,16 @@ function Home() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           {user ? (
             <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Link to="/profile" style={{ color: '#e8e8e8', fontSize: '14px', fontFamily: 'Arial' }}>{user.username}</Link>
-              </div>
-              <Link to="/profile" style={{ color: '#aaa', fontSize: '14px', fontFamily: 'Arial' }}>Profile</Link>
+              <Link to="/profile" style={{ display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}>
+                {navAvatar && !navAvatarError ? (
+                  <img src={navAvatar} alt="avatar" style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #f5c518' }} onError={() => setNavAvatarError(true)} />
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#aaa" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+                  </svg>
+                )}
+                <span style={{ color: '#e8e8e8', fontSize: '14px', fontFamily: 'Arial' }}>{user.username}</span>
+              </Link>
               {user.role === 'admin' && (
               <Link to="/admin" style={{ color: '#f5c518', fontSize: '14px', fontFamily: 'Arial', fontWeight: 'bold' }}>Admin</Link>
               )}

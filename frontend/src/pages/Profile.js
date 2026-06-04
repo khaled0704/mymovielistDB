@@ -201,7 +201,7 @@ function Profile() {
 
     try {
       const res = await API.put('/auth/profile', { username, bio, avatar });
-      localStorage.setItem('user', JSON.stringify({ ...user, username: res.data.user.username }));
+      localStorage.setItem('user', JSON.stringify({ ...user, username: res.data.user.username, avatar }));
       setSuccess('Profile updated successfully!');
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update profile');
@@ -226,9 +226,18 @@ function Profile() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
           {user ? (
             <>
-              <span style={{ color: '#aaa', fontSize: '14px' }}>?? {user.username}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                {avatar && !imgError ? (
+                  <img src={avatar} alt="avatar" style={{ width: '28px', height: '28px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #F5C518' }} onError={() => setImgError(true)} />
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#aaa" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+                  </svg>
+                )}
+                <span style={{ color: '#e8e8e8', fontSize: '14px' }}>{user.username}</span>
+              </div>
               <Link to="/profile" style={{ ...styles.navLink, ...styles.activeLink }}>Profile</Link>
-              <button onClick={handleLogout} style={styles.secondaryButton}>Sign Out</button>
+              <button onClick={handleLogout} style={{ padding: '5px 14px', background: 'transparent', color: '#aaa', border: '1px solid #444', borderRadius: '4px', fontSize: '13px', cursor: 'pointer' }}>Sign Out</button>
             </>
           ) : (
             <Link to="/login" style={styles.navLink}>Sign In</Link>
