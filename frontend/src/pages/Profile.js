@@ -140,6 +140,8 @@ const styles = {
     borderRadius: '50%',
     objectFit: 'cover',
     border: '3px solid #F5C518',
+    display: 'block',
+    margin: '0 auto',
   },
   avatarFallback: {
     width: '110px',
@@ -168,6 +170,7 @@ function Profile() {
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
   const [avatar, setAvatar] = useState('');
+  const [imgError, setImgError] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
@@ -182,9 +185,9 @@ function Profile() {
 
     API.get('/auth/profile')
       .then((res) => {
-        setUsername(res.data.username);
-        setBio(res.data.bio);
-        setAvatar(res.data.avatar);
+        setUsername(res.data.username || '');
+        setBio(res.data.bio || '');
+        setAvatar(res.data.avatar || '');
       })
       .catch(() => {
         setError('Unable to load profile');
@@ -235,11 +238,18 @@ function Profile() {
 
       <div style={styles.pageWrap}>
         <div style={styles.avatarWrap}>
-          {avatar ? (
-            <img src={avatar} alt="avatar" style={styles.avatar} />
+          {avatar && !imgError ? (
+            <img
+              src={avatar}
+              alt="avatar"
+              style={styles.avatar}
+              onError={() => setImgError(true)}
+            />
           ) : (
             <div style={styles.avatarFallback}>
-              <span style={{ fontSize: '42px' }}>??</span>
+              <span style={{ fontSize: '42px', color: '#aaa' }}>
+                {username ? username[0].toUpperCase() : '?'}
+              </span>
             </div>
           )}
           <h1 style={styles.avatarTitle}>{username || 'Your Profile'}</h1>
@@ -266,7 +276,7 @@ function Profile() {
               type="text"
               placeholder="Paste an image URL"
               value={avatar}
-              onChange={(e) => setAvatar(e.target.value)}
+              onChange={(e) => { setAvatar(e.target.value); setImgError(false); }}
               style={styles.input}
             />
 
