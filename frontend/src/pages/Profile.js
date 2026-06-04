@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import API from '../api';
 
@@ -171,7 +171,8 @@ function Profile() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('user'));
+  const userRef = useRef(JSON.parse(localStorage.getItem('user')));
+  const user = userRef.current;
 
   useEffect(() => {
     if (!user) {
